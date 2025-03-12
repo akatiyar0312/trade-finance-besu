@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: besu-node
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: besu
+  template:
+    metadata:
+      labels:
+        app: besu
+    spec:
+      containers:
+        - name: besu
+          image: hyperledger/besu:latest
+          args:
+            - --network=dev
+            - --rpc-http-enabled
+            - --rpc-http-api=ETH,NET,IBFT
+            - --data-path=/data
+          ports:
+            - containerPort: 8545
+            - containerPort: 8546
