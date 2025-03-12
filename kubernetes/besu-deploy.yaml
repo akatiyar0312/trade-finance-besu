@@ -1,9 +1,11 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: besu-node
+  name: besu
+  namespace: besu
 spec:
-  replicas: 3
+  serviceName: "besu"
+  replicas: 1
   selector:
     matchLabels:
       app: besu
@@ -13,13 +15,17 @@ spec:
         app: besu
     spec:
       containers:
-        - name: besu
-          image: hyperledger/besu:latest
-          args:
-            - --network=dev
-            - --rpc-http-enabled
-            - --rpc-http-api=ETH,NET,IBFT
-            - --data-path=/data
-          ports:
-            - containerPort: 8545
-            - containerPort: 8546
+      - name: besu
+        image: hyperledger/besu:latest
+        ports:
+        - containerPort: 8545
+        - containerPort: 8546
+        - containerPort: 30303
+        args:
+        - --network=dev
+        - --rpc-http-enabled
+        - --rpc-http-host=0.0.0.0
+        - --rpc-http-api=ETH,NET,WEB3
+        - --rpc-ws-enabled
+        - --rpc-ws-host=0.0.0.0
+        - --host-whitelist=*
