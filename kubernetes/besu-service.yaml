@@ -4,7 +4,8 @@ metadata:
   name: besu-service
   namespace: besu
 spec:
-  type: LoadBalancer  # Change from ClusterIP
+  type: LoadBalancer
+  loadBalancerIP: 34.8.2.132  # Set your reserved IP
   selector:
     app: besu
   ports:
