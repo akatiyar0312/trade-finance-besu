@@ -4,19 +4,19 @@ metadata:
   name: besu-service
   namespace: besu
 spec:
+  type: LoadBalancer  # Change from ClusterIP
   selector:
     app: besu
   ports:
-    - name: rpc
-      protocol: TCP
+    - name: json-rpc
       port: 8545
       targetPort: 8545
-    - name: ws
       protocol: TCP
+    - name: websocket
       port: 8546
       targetPort: 8546
-    - name: p2p
       protocol: TCP
+    - name: p2p
       port: 30303
       targetPort: 30303
-  type: ClusterIP
+      protocol: TCP
