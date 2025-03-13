@@ -1,35 +1,30 @@
-import { createWeb3 } from 'web3';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import Web3 from "web3";
+import fs from "fs";
+import path from "path";
 
-// Convert __dirname to work with ES Modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Load bank accounts
+const accountFile = path.join(__dirname, "bankAccounts.json");
+const accounts = JSON.parse(fs.readFileSync(accountFile, "utf-8"));
 
-// Connect to Besu
-const web3 = createWeb3("http://34.57.7.67:8545");
+// Connect to Besu Node
+const web3 = new Web3(new Web3.providers.HttpProvider("http://34.57.7.67:8545"));
+// Load contract ABI and bytecode
+const contractPath = path.join(__dirname, "build", "TokenizedDeposit.json");
+const { abi, bytecode } = JSON.parse(fs.readFileSync(contractPath, "utf-8"));
 
-// Load Contract ABI and Bytecode
-const contractPath = path.join(__dirname, '../output', 'BillOfExchange_sol_BillOfExchange');
-const abi = JSON.parse(fs.readFileSync(contractPath + '.abi', 'utf-8'));
-const bytecode = fs.readFileSync(contractPath + '.bin', 'utf-8');
-
-// Deploy the contract
+// Deploy contract using Central Bank account
 const deployContract = async () => {
-    try {
-        const accounts = await web3.eth.getAccounts();
-        console.log("Deploying from account:", accounts[0]);
+    const centralBank = accounts.centralBank;
+    web3.eth.accounts.wallet.add(centralBank.privateKey);
 
-        const contract = new web3.eth.Contract(abi);
-        
-        const deployedContract = await contract.deploy({ data: '0x' + bytecode })
-            .send({ from: accounts[0], gas: 5000000 });
+    const contract = new web3.eth.Contract(abi);
+    const deployedContract = await contract.deploy({ data: "0x" + bytecode, arguments: [1000000] })
+        .send({ from: centralBank.address, gas: 5000000 });
 
-        console.log("✅ Contract deployed at:", deployedContract.options.address);
-    } catch (error) {
-        console.error("❌ Deployment failed:", error);
-    }
+    console.log("✅ Contract Deployed at:", deployedContract.options.address);
+
+    // Save contract address
+    fs.writeFileSync(path.join(__dirname, "contractAddress.json"), JSON.stringify({ address: deployedContract.options.address }));
 };
 
 deployContract();
