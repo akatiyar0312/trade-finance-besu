@@ -4,15 +4,14 @@ metadata:
   name: besu-service
   namespace: besu
 spec:
-  type: LoadBalancer  # Exposes externally (for GCP)
   selector:
     app: besu
   ports:
-    - name: rpc-http
+    - name: rpc
       protocol: TCP
       port: 8545
       targetPort: 8545
-    - name: rpc-ws
+    - name: ws
       protocol: TCP
       port: 8546
       targetPort: 8546
@@ -20,3 +19,4 @@ spec:
       protocol: TCP
       port: 30303
       targetPort: 30303
+  type: ClusterIP

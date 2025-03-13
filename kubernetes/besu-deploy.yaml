@@ -18,9 +18,9 @@ spec:
       - name: besu
         image: hyperledger/besu:latest
         ports:
-        - containerPort: 8545
-        - containerPort: 8546
-        - containerPort: 30303
+        - containerPort: 8545  # JSON-RPC HTTP
+        - containerPort: 8546  # WebSockets
+        - containerPort: 30303 # P2P communication
         args:
         - --network=dev
         - --rpc-http-enabled
@@ -29,3 +29,15 @@ spec:
         - --rpc-ws-enabled
         - --rpc-ws-host=0.0.0.0
         - --host-allowlist=*
+        - --data-path=/var/lib/besu
+        volumeMounts:
+        - name: besu-data
+          mountPath: /var/lib/besu
+  volumeClaimTemplates:
+  - metadata:
+      name: besu-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
