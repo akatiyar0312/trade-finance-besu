@@ -3,7 +3,9 @@ const fs = require('fs');
 const path = require('path');
 
 // Connect to Besu
-const web3 = new Web3(new Web3.providers.HttpProvider("http://34.57.7.67:8545"));  // Update with your Besu node IP
+const Web3 = require('web3');
+const web3 = new Web3("http://34.57.7.67:8545");  // Corrected Web3 initialization
+
 
 // Load Contract ABI and Bytecode
 const contractPath = path.join(__dirname, 'output', 'BillOfExchange_sol_BillOfExchange');
